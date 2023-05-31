@@ -1,34 +1,14 @@
-#cloud-config
+#!/bin/bash
 
-package_update: true
-package_upgrade: true
-
-
-
-groups:
-- docker
-
-
-system_info:
-  default_user:
-    groups: [docker]
+#Installing Docker
+sudo apt-get update
+sudo apt install docker.io -y
+sudo groupadd docker
+sudo usermod -aG docker $USER
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
 
 
-apt:
-  sources:
-  # https://canonical-cloud-init.readthedocs-hosted.com/en/latest/reference/examples.html#additional-apt-configuration-and-repositories
-    docker.list:
-      source: "deb [arch=amd64 signed-by=$KEY_FILE] https://download.docker.com/linux/ubuntu focal stable"
-      keyid: 8D81803C0EBFCD88 # GPG key ID published on a key server
-
-
-
-packages:
-# https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
-- docker-ce
-- docker-ce-cli
-- containerd.io
-- unattended-upgrades
-runcmd:
-- sudo docker run --name docker-nginx -p 80:80 nouma2016/ana-nginx-image
-
+#Creating container
+sudo docker pull rambaris/ngnixserverweb:latest
+sudo docker run -d --name webserver -p 80:80 rambaris/ngnixserverweb:latest
